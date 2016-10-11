@@ -45,14 +45,14 @@ RUN wget http://www.norg.uminho.pt/aivaz/pswarm/software/PPSwarm_v1_5.zip -O \
     cd /bcmd/PPSwarm_v1_5 && \
     make py && \
     cp pswarm_py.so /bcmd/batch/pylib/ && \
-    cd .. && rm -r ./PPSwarm_v1_5
+    cd ..
 
-
-
-ADD hello_world.py /bcmd
 #set working directory to where bcmd files are
 WORKDIR /bcmd
-CMD [ "python", "./hello_world.py" ]
+RUN ./autogen.sh && \
+    ./configure && \
+    make
+CMD ["/bin/bash"]
 
 # TODO dockerignore file
 # TODO check directory structure and then mkdir
