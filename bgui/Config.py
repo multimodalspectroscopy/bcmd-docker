@@ -15,6 +15,8 @@ RESOURCES = os.path.join(BCMD_HOME, 'resources')
 MODEL_PATH = [ os.path.join(BCMD_HOME, 'examples') ]
 INPUT_PATH = [ os.path.join(BCMD_HOME, 'examples') ]
 
+# fields named below will be saved to and loaded from the prefs file
+# if you add new config data that you want to be saved, add the field names here
 PREF_FIELDS = [ 'model_path', 'input_path',
                 'model_name', 'model_src', 'model_dir',
                 'input_file', 'input_dir',
@@ -46,6 +48,8 @@ PREF_FIELDS = [ 'model_path', 'input_path',
                 'data_file', 'shared_data_file',
                 'data_source',
 
+# since there is currently no way to create custom presets
+# we don't currently save the presets list
 #                'presets',
                 
                 'output_header', 'output_subset',
@@ -108,6 +112,8 @@ SYNTH_DATA = 1
 # some of these details may get overridden by prefs file, but set defaults here
 class Config(object):
     def __init__(self, args=[]):
+    
+        # initialise properties to their default values
         self.home = BCMD_HOME
         self.parser = PARSER
         self.prefs = os.path.join(USER_HOME, PREFS)
@@ -188,6 +194,8 @@ class Config(object):
         self.load()
 
     
+    # in theory, process command-line arguments to do stuff like specifying a different config file
+    # so far there hasn't been any reason to do this so I haven't implemented it
     def process_args(self, args):
         # TODO
         pass

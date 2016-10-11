@@ -328,3 +328,110 @@ param.compare <- function ( p1, p2 )
 	
 	return(result)
 }
+
+# export selected columns from data frame to a BCMD input file
+#
+# this is very similar to write.input in synth.R, with the following modifications:
+# - only a single time column is expected, rather than start and end times
+# - the time column is explicitly specified
+# - a subset of columns can be chosen
+# - columns from the data can be mapped to different names in the model
+#
+# the first specified column is taken to be time
+# outnames specifies the parameter names to be used in the file
+# -- the first name is ignored, since time is part of the file syntax, not a parameter
+# init specifies whether to initialise data params before equilibration
+# steady specifies how long to equilibrate for (if NULL or < 0 then don't equilibrate)
+write.selected <- function ( xx, filename, cols=names(xx), outnames=cols, init=TRUE, steady=1000 )
+{
+	t0 <- xx[,cols[1]]
+	N <- length(t0)
+
+	# we assume that the last step is the same length as the one before it
+	t1 <- c(t0[-1], t0[N] + t0[N] - t0[N-1])
+	
+	params <- outnames[-1]
+	P <- length(params)
+
+	M <- as.matrix(xx[,cols[-1]])
+
+	ff <- file(filename, "wt")
+	cat("# BCMD input file generated from R by write.selected\n", file=ff)
+	
+	
+	if ( !is.null(steady) && steady > 0 )
+	{
+		cat("@", N + 1, "\n", sep=" ", file=ff)
+		cat("# disable output for equilibration\n", file=ff)
+		cat("!0\n>>> 0\n", file=ff)
+		
+		if ( init )
+		{
+			cat("# equilibrate to initial parameter values\n", file=ff)
+			cat(":", P, params, "\n", sep=" ", file=ff)
+			cat("=", t0[1]-steady, t0[1], M[1,], "\n", sep=" ", file=ff)
+		}
+		else
+		{
+			cat("# equilibrate to default parameter values\n", file=ff)
+			cat(": 0\n", file=ff)
+			cat("=", t0[1]-steady, t0[1], "\n", file=ff)
+		}
+		
+		cat("# restore output\n", file=ff)
+		cat("!!!\n>>> *\n", file=ff)
+		
+		if ( ! init )
+		{
+			cat(":", P, params, "\n", sep=" ", file=ff)
+		}
+	}
+	else
+	{
+		cat("@", N, "\n", sep=" ", file=ff)		
+		cat(":", P, params, "\n", sep=" ", file=ff)
+	}
+	
+	for ( ii in 1:N )
+	{
+		cat("=", t0[ii], t1[ii], M[ii,], "\n", sep=" ", file=ff)
+	}
+	
+	close(ff)
+}
+
+# generate a data frame for use with write.selected
+# containing a step sequence appropriate for
+# a steady-state plot of some parameter
+steady <- function ( param="P_a", lo=50, hi=200, base=100, step=1, time=1000 )
+{
+	xx <- c(seq(from=base, to=lo, by=-step), seq(from=lo, to=hi, by=step))
+	tt <- 0:(length(xx)-1) * time
+	
+	result <- data.frame(time=tt, xx=xx)
+	names(result)[2] <- param
+	return(result)
+}
+
+table.generator<-function(params,t,par.vals){
+  #parameters = vector of parameters as strings
+  #t = vector of time steps t_n long
+  #par.vals = matrix of parameter values at each time step.
+  #           Should be t_n by len(params)
+  if(missing(t)||missing(params)||missing(par.vals)){
+    stop("Please check provided parameters.")
+  }
+  
+  if(dim(par.vals)[1]!=length(t)){
+    stop("Please provide parameter values for exactly each time step.")
+  }
+  
+  if(dim(par.vals)[2]!=length(params)){
+    stop("Please provide values for exactly each named parameter.")
+  }
+
+
+  input.table <- data.frame(t,par.vals)
+  colnames(input.table)[-1]<-c(params)
+  return(input.table)
+}

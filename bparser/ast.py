@@ -109,6 +109,9 @@ def process(merged, sources, independent='t'):
     
     work['unused'] = set(work['symbols'].keys()) - work['required']
     
+    work['ind_params'] = sorted([x for x in work['params'] if len(work['symbols'][x]['depends']) == 0], key=str.lower)
+    work['deriv_params'] = sorted([x for x in work['params'] if x not in work['ind_params']], key=str.lower)
+    
     work['known'] = work['functions'] & STD_FUNCS
     work['unknown'] = work['functions'] - STD_FUNCS
         
@@ -240,7 +243,7 @@ def dependency_sort(names, exprs):
         if len(names) >= stopper.get(name, len(names)+1):
             # we're now going around in circles
             logger.error('Unresolved circular dependency in assignments (at symbol ' \
-                          + name + '), model may not non-viable')
+                          + name + '), model may be non-viable')
             ordered_names.append(name)
             ordered_names += names
             ordered_exprs.append(expr)
@@ -307,7 +310,7 @@ def choose_assignments(symbol):
     return lo_expr, hi_expr
 
 
-# unrecognised items and those we don't deal with yet (notably DOC)
+# unrecognised items and those we don't deal with yet
 def ignore_item(item, work):
     logger.detail("Ignoring item: " + item[0])
 
@@ -336,7 +339,6 @@ def declare_symbol(name, work):
     return symbol
 
 # process documentation comments
-# for the moment we just stash them, but...
 def process_doc(item, work):
     work['docs'].append(item[1])
     

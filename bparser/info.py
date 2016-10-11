@@ -96,15 +96,15 @@ def logModelInfo(model, config):
         for name in sorted(model['inputs'], key=str.lower):
             logger.message(name)
     
-    if model['params']:
-        logger.message('\nThe following symbols are parameters, independent of the solver variables:')
-        for name in sorted(model['params'], key=str.lower):
+    if model['ind_params']:
+        logger.message('\nThe following symbols are true parameters, with no dependencies:')
+        for name in model['ind_params']:
             logger.message(name)
-        
-        logger.message('\nThe following parameters have no dependencies at all:')
-        for name in sorted(model['params'], key=str.lower):
-            if len(model['symbols'][name]['depends']) == 0:
-                logger.message(name)
+    
+    if model['deriv_params']:
+        logger.message('\nThe following symbols are derived parameters, independent of solver variables but dependent on other parameters:')
+        for name in model['deriv_params']:
+            logger.message(name)
     
     if model['intermeds']:
         logger.message('\nThe following symbols are intermediates, with solver variable dependencies:')
@@ -158,7 +158,8 @@ def logModelInfo(model, config):
     logger.message('** summary for model %s **' % config['name'])
     logger.message('%d model variables (%d differential, %d algebraic)' % (len(model['roots']), len(model['diffs']), len(model['algs'])))
     logger.message('%d intermediate variables (%d unused)' % (len(model['intermeds']), len([x for x in model['intermeds'] if x in model['unused']])))
-    logger.message('%d parameters (%d unused)' % (len(model['params']), len([x for x in model['params'] if x in model['unused']])))
+    logger.message('%d independent parameters (%d unused)' % (len(model['ind_params']), len([x for x in model['ind_params'] if x in model['unused']])))
+    logger.message('%d derived parameters (%d unused)' % (len(model['deriv_params']), len([x for x in model['deriv_params'] if x in model['unused']])))
     logger.message('%d unsatisfied external dependencies\n' % len(model['extern']))
 
     logger.message('')
@@ -168,7 +169,10 @@ def modelInfo(model, config):
     result = '** summary for model %s **\n' % config['name']
     result += '%d model variables (%d differential, %d algebraic)\n' % (len(model['roots']), len(model['diffs']), len(model['algs']))
     result += '%d intermediate variables (%d unused)\n' % (len(model['intermeds']), len([x for x in model['intermeds'] if x in model['unused']]))
-    result += '%d parameters (%d unused)\n' % (len(model['params']), len([x for x in model['params'] if x in model['unused']]))
+    
+    result += '%d independent parameters (%d unused)\n' % (len(model['ind_params']), len([x for x in model['ind_params'] if x in model['unused']]))
+    result += '%d derived parameters (%d unused)\n' % (len(model['deriv_params']), len([x for x in model['deriv_params'] if x in model['unused']]))
+    
     result += '%d unsatisfied external dependencies\n' % len(model['extern'])
     
     result += '\n** equations **\n'
@@ -209,15 +213,13 @@ def modelInfo(model, config):
         for name in sorted(model['inputs'], key=str.lower):
             result += name + '\n'
     
-    if model['params']:
-        result += '\nThe following symbols are parameters, independent of the solver variables:\n'
-        for name in sorted(model['params'], key=str.lower):
-            result += name + '\n'
+    if model['ind_params']:
+        result += '\nThe following symbols are true parameters, with no dependencies:\n'
+        result += '\n'.join(model['ind_params'])
 
-        result += '\nThe following parameters have no dependencies at all:\n'
-        for name in sorted(model['params'], key=str.lower):
-            if len(model['symbols'][name]['depends']) == 0:
-                result += name + '\n'
+    if model['deriv_params']:
+        result += '\nThe following symbols are derived parameters, independent of solver variables but dependent on other parameters:\n'
+        result += '\n'.join(model['deriv_params'])        
     
     if model['intermeds']:
         result += '\nThe following symbols are intermediates, with solver variable dependencies:\n'

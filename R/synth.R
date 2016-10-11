@@ -89,18 +89,22 @@ nirs.mix <- function ( tt=TT, lo=0, hi=1 )
 
 # function returning a matrix of signals of various types
 # all using the same timebase and scaled into the same range
-signals <- function ( tt=TT, lo=0, hi=1 )
+signals <- function ( tt=TT, lo=0, hi=1, short=FALSE )
 {
-	result <- matrix(0, nrow=8, ncol=length(tt))
+	result <- matrix(0, nrow=ifelse(short,4,8), ncol=length(tt))
 	
-	result[1,] <- (lo + hi) / 2
-	result[2,] <- ramp(tt, lo=lo, hi=hi)
-	result[3,] <- noise(tt, lo=lo, hi=hi)
-	result[4,] <- sine(tt, f=0.01, lo=lo, hi=hi)
-	result[5,] <- square(tt, f=0.01, duty=0.2, lo=lo, hi=hi)
-	result[6,] <- saw(tt, f=0.1, phi=pi, lo=lo, hi=hi)
-	result[7,] <- walk(tt, lo=lo, hi=hi)
-	result[8,] <- nirs.mix(tt, lo=lo, hi=hi)
+	result[1,] <- sine(tt, f=0.01, lo=lo, hi=hi)
+	result[2,] <- noise(tt, lo=lo, hi=hi)
+	result[3,] <- square(tt, f=0.01, duty=0.2, lo=lo, hi=hi)
+	result[4,] <- nirs.mix(tt, lo=lo, hi=hi)
+	
+	if ( !short )
+	{
+		result[5,] <- (lo + hi) / 2
+		result[6,] <- walk(tt, lo=lo, hi=hi)
+		result[7,] <- saw(tt, f=0.1, phi=pi, lo=lo, hi=hi)
+		result[8,] <- ramp(tt, lo=lo, hi=hi)
+	}
 	
 	invisible(result)
 }
@@ -117,6 +121,8 @@ co2.good <- signals(TT, lo=37, hi=45)
 co2.bad <- signals(TT, lo=30, hi=50)
 o2.good <- signals(TT, lo=0.9, hi=1)
 o2.bad <- signals(TT, lo=0.6, hi=1)
+u.good <- signals(TT, lo=0.8, hi=1.2)
+u.bad <- signals(TT, lo=0.5, hi=1.5)
 
 # function generating data frames of input values for combos of input signals
 # defaults to standard BrainSignals inputs over "reasonable" ranges
@@ -158,6 +164,11 @@ combos <- function ( tt=TT,
 	
 	invisible(tables)
 }
+
+abbrev.fields <- list(SaO2sup=signals(TT, lo=0.8, hi=1, short=TRUE),
+                      Pa_CO2=signals(TT, lo=37, hi=43, short=TRUE),
+                      P_a=signals(TT, lo=80, hi=120, short=TRUE),
+                      u=signals(TT, lo=0.5, hi=1.5, short=TRUE))
 
 # dump a data frame (as generated above) to a BCMD input file
 # first two columns are assumed to be start and end times for each step

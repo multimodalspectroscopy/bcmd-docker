@@ -29,7 +29,7 @@ INFO = 'optim.info'
 
 # defaults
 JOB_MODE = 'GLP'
-SOLVER = 'pswarm'
+SOLVER = 'galileo'
 PARAM_SELECT = '*'
 DISTANCE = 'euclidean'
 MAX_ITER = 1e3

@@ -43,7 +43,8 @@ def printOverview(file, model, config):
     print >> file, '\\item %d differential state variables' % len(model['diffs'])
     print >> file, '\\item %d algebraic state variables' % len(model['algs'])
     print >> file, '\\item %d intermediate variables' % len(model['intermeds'])
-    print >> file, '\\item %d parameters' % len(model['params'])
+    print >> file, '\\item %d independent parameters' % len(model['ind_params'])
+    print >> file, '\\item %d derived parameters' % len(model['deriv_params'])
     print >> file, '\\item %d declared inputs' % len(model['inputs'])
     print >> file, '\\item %d default outputs' % len(model['outputs'])
     print >> file, '\\end{itemize}\n'
@@ -253,7 +254,8 @@ def printIntermeds(file, model, config):
     printVars(sorted(model['intermeds'], key=lambda s: s.lower()), 'Intermediate Variables', file, model, config)
 
 def printParameters(file, model, config):
-    printVars(sorted(model['params'], key=lambda s: s.lower()), 'Parameters', file, model, config, omit_expr=True)
+    printVars(model['ind_params'], 'Parameters', file, model, config, omit_expr=True)
+    printVars(model['deriv_params'], 'Derived Parameters', file, model, config)
 
 def printVars(vars, title, file, model, config, omit_expr=False):
     if vars:
