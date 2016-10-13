@@ -1,9 +1,0 @@
-# single variable first-order filter, as used in the BS/BP blood flow models
-vx' = (x - vx) / tau_x
-
-# initial conditions
-x := 1
-vx := x
-
-# params
-tau_x := 1

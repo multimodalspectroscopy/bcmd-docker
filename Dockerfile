@@ -1,9 +1,9 @@
 FROM python:2
 MAINTAINER Joshua Russell-Buckland (joshua-russell-buckland.15@ucl.ac.uk)
 
-RUN mkdir /bcmd
+#RUN mkdir /bcmd
 
-ADD . /bcmd
+#ADD . /bcmd
 
 # Installing the 'apt-utils' package gets rid of the 'debconf: delaying package configuration, since apt-utils is not installed'
 # error message when installing any other package with the apt-get package manager.
@@ -32,25 +32,29 @@ RUN pip install numpy \
     easy_install DerApproximator && \
     easy_install SpaceFuncs
 
+RUN git clone https://github.com/bcmd/BCMD.git
+
 RUN wget http://www.norg.uminho.pt/aivaz/pswarm/software/PPSwarm_v1_5.zip -O \
     tmp.zip && \
-    unzip tmp.zip -d /bcmd && \
+    unzip tmp.zip -d /BCMD && \
     rm tmp.zip && \
     # incorrect python reference inside Pswarm make file. Use SED to amend
-    sed -i 's/python2.5/python2.7/g' /bcmd/PPSwarm_v1_5/makefile && \
+    sed -i 's/python2.5/python2.7/g' /BCMD/PPSwarm_v1_5/makefile && \
     sed -i 's/usr\/include\/python2.7/usr\/local\/include\/python2.7/g' \
-    /bcmd/PPSwarm_v1_5/makefile && \
+    /BCMD/PPSwarm_v1_5/makefile && \
     sed -i 's/usr\/lib\/python2.7/usr\/local\/lib\/python2.7/g' \
-    /bcmd/PPSwarm_v1_5/makefile && \
-    cd /bcmd/PPSwarm_v1_5 && \
+    /BCMD/PPSwarm_v1_5/makefile && \
+    cd /BCMD/PPSwarm_v1_5 && \
     make py && \
-    cp pswarm_py.so /bcmd/batch/pylib/ && \
-    cd ..
+    cp pswarm_py.so /BCMD/batch/pylib/ && \
+    cd .. && \
+    rm -r PPSwarm_v1_5
 
 #set working directory to where bcmd files are
-WORKDIR /bcmd
-RUN ./autogen.sh && \
-    ./configure && \
+WORKDIR /BCMD
+
+
+RUN ./configure && \
     make
 CMD ["/bin/bash"]
 
