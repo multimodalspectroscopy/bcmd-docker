@@ -55,7 +55,8 @@ WORKDIR /BCMD
 
 
 RUN ./configure && \
-    make
+    make && \
+    mkdir working
 CMD ["/bin/bash"]
 
 # TODO dockerignore file
