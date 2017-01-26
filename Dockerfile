@@ -16,6 +16,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Insall unzip to deal with ppswarm at later date and all compilers
