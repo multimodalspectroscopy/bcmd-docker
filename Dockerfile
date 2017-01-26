@@ -57,6 +57,10 @@ WORKDIR /BCMD
 RUN ./configure && \
     make && \
     mkdir working
+
+RUN cd examples && \
+    git clone https://github.com/bcmd/bsx.git
+    
 CMD ["/bin/bash"]
 
 # TODO dockerignore file
