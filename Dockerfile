@@ -16,6 +16,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Insall unzip to deal with ppswarm at later date and all compilers
@@ -57,6 +58,10 @@ WORKDIR /BCMD
 RUN ./configure && \
     make && \
     mkdir working
+
+RUN cd examples && \
+    git clone https://github.com/bcmd/bsx.git
+    
 CMD ["/bin/bash"]
 
 # TODO dockerignore file
