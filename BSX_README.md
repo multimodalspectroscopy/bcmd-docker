@@ -1,6 +1,7 @@
 ## README for the Functional Activation tests using BSX
 
 After downloading and running the Dockerfile the following commands can be used in order to fun optimisation tests on the BSX model.
+
 0. Build the docker image using
 ```shell
 docker build --rm --no-cache -t bcmd-docker:latest .
