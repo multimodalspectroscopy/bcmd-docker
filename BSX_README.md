@@ -44,3 +44,10 @@ where `child_directory` is the specific directory of interest.
 The above command will attempt to run a global optimisation for all parameters specified within `bsx_pdist.txt`. If you wish to change any of the parameter distributions or the optjob file, nano is installed in the container for simple text editing purposes.
 It is used by simply typing `nano path/to/file`. More information on how to use nano can be found [here](https://wiki.gentoo.org/wiki/Nano/Basics_Guide).
 The most obvious change would be to the parameters you wish to optimise. This is done by changing the `param_select` field within the `bsxFuncAct.optjob` file from '*' to the names of the parameters of interest.
+
+You may also wish to output the information that is printed to the terminal in a single textfile for use later. The recommended way of doing this at present is 
+  ```shell
+  python optim_demand.py bsx/bsxFuncAct.optjob ../working/ >> ../working/optim_output.txt
+  ```
+or similar. This creates a file called `optim_output.txt` inside the container's `working` directory. This is then accessible outside of the container inside the folder `data_files`, which you linked to `working` upon starting the container.
+  
